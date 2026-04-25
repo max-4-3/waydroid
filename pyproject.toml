@@ -1,4 +1,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
+[project]
+name = "waydroid"
+version = "1.6.2"
+description = "A container-based approach to boot a full Android system on a regular GNU/Linux system"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dbus-python>=1.4.0",
+    "gbinder>=1.2.1",
+    "pygobject>=3.56.2",
+]
 
 [tool.autopep8]
 max-line-length = 131

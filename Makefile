@@ -1,3 +1,13 @@
+CWD := $(shell pwd)
+UV := uv --directory=$(CWD) --project=$(CWD) --cache-dir=$(CWD)/.cache/uv run waydroid.py
+
+DEFAULT_EXEC = Exec=waydroid
+DEFAULT_EXEC_START = ExecStart=/usr/bin/waydroid
+MODIFIED_EXEC := Exec=$(UV)
+MODIFIED_EXEC_START := ExecStart=$(UV)
+
+SED_INPLACE = sed -i
+
 PREFIX := /usr
 
 USE_SYSTEMD ?= 1
@@ -33,6 +43,8 @@ build:
 	@echo "Nothing to build, run 'make install' to copy the files!"
 
 install:
+	find -type f \( -name '*.desktop' -o -name '*.service' \) -exec $(SED_INPLACE) 's|$(DEFAULT_EXEC)|$(MODIFIED_EXEC)|g' {} \;
+	find -type f \( -name '*.desktop' -o -name '*.service' \) -exec $(SED_INPLACE) 's|$(DEFAULT_EXEC_START)|$(MODIFIED_EXEC_START)|g' {} \;
 	install -d $(INSTALL_WAYDROID_DIR) $(INSTALL_BIN_DIR) $(INSTALL_DBUS_DIR)/system.d $(INSTALL_POLKIT_DIR)/actions
 	install -d $(INSTALL_APPS_DIR) $(INSTALL_METAINFO_DIR) $(INSTALL_ICONS_DIR)/hicolor/512x512/apps
 	install -d $(INSTALL_APPS_DIRECTORY_DIR) $(INSTALL_APPS_MENU_DIR)
@@ -58,6 +70,8 @@ install:
 	if [ $(USE_NFTABLES) = 1 ]; then \
 		sed '/LXC_USE_NFT=/ s/false/true/' -i $(INSTALL_WAYDROID_DIR)/data/scripts/waydroid-net.sh; \
 	fi
+	find -type f \( -name '*.desktop' -o -name '*.service' \) -exec $(SED_INPLACE) 's|$(MODIFIED_EXEC)|$(DEFAULT_EXEC)|g' {} \;
+	find -type f \( -name '*.desktop' -o -name '*.service' \) -exec $(SED_INPLACE) 's|$(MODIFIED_EXEC_START)|$(DEFAULT_EXEC_START)|g' {} \;
 
 install_apparmor:
 	install -d $(INSTALL_APPARMOR_DIR) $(INSTALL_APPARMOR_DIR)/lxc
